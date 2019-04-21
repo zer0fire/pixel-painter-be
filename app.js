@@ -6,7 +6,7 @@ const fs = require('fs')
 
 const app = express()
 const port = 3005
-const server = app.listen(port, () => {
+const server = app.listen(port, '0.0.0.0', () => {
   console.log('server listening on port', port)
 })
 
@@ -17,30 +17,32 @@ const io = socketIO(server)
 
 // var clients = []
 async function main() {
-  const pixelData = await Jimp.read("./pixelData.png") // new Jimp.create(20, 20, 0xffff00ff)
+  const pixelData = await Jimp.read("./23333.png") // new Jimp.create(20, 20, 0xffff00ff)
+  let onlineCount = 0
   // console.log("------------", pixelData)
   io.on('connection', async (socket) => {
-    // 这里改成了JPG格式
-    // var jpgBuffer = await pixelData.getBufferAsync(Jimp.MIME_JPEG)
+    onlineCount++
+
+    io.emit('online-count', onlineCount)
+    // socket.broadcast.emit('online-count', onlineCount)
+    // socket.emit('online-count', onlineCount)
+
     var pngBuffer = await pixelData.getBufferAsync(Jimp.MIME_PNG)
-    // ClientRectList.push(socket)
-    // socket.emit('initial-pixel-data', jpgBuffer)
+
     socket.emit('initial-pixel-data', pngBuffer)
-    // dotInfo
+
     socket.on('draw-dot', async ({row, col, color}) => {
       
       var hexColor = Jimp.cssColorToHex(color)
-      // console.log(hexColor, col, row);
       
       pixelData.setPixelColor(hexColor, col, row) // [col][row] = color
-      // console.log({row, col, color})
       
-      socket.broadcast.emit('update-dot', {row, col, color})
-      socket.emit('update-dot', {row, col, color})
+      io.emit('update-dot', {row, col, color})
+      // socket.broadcast.emit('update-dot', {row, col, color})
+      // socket.emit('update-dot', {row, col, color})
 
       var buf = await pixelData.getBufferAsync(Jimp.MIME_PNG)
-      // var buf = await pixelData.getBufferAsync(Jimp.MIME_JPEG)
-      fs.writeFile('./pixelData.png', buf, (err) =>{
+      fs.writeFile('./23333.png', buf, (err) =>{
         if(err) {
           console.log(err)
         } else {
@@ -50,7 +52,7 @@ async function main() {
     })
 
     socket.on('disconnect', () => {
-      // clients = clients.filter(it => it != socket)
+      onlineCount--
       console.log('some one leave')
     })
 
