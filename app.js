@@ -12,13 +12,14 @@ const server = app.listen(port, '0.0.0.0', () => {
 
 const io = socketIO(server)
 
-// app.use(express.static())
+app.use(express.static(path.join(__dirname, '../fe/build')))
 
 
 // var clients = []
 async function main() {
   const pixelData = await Jimp.read("./23333.png") // new Jimp.create(20, 20, 0xffff00ff)
   let onlineCount = 0
+  let bufDataAry = []
   // console.log("------------", pixelData)
   io.on('connection', async (socket) => {
     onlineCount++
@@ -42,13 +43,18 @@ async function main() {
       // socket.emit('update-dot', {row, col, color})
 
       var buf = await pixelData.getBufferAsync(Jimp.MIME_PNG)
-      fs.writeFile('./23333.png', buf, (err) =>{
-        if(err) {
-          console.log(err)
-        } else {
-          console.log('save data success!')
+      bufDataAry.push(buf)
+      if(bufDataAry.length > 4) {
+        for(var item of bufDataAry) {
+          fs.writeFile('./23333.png', item, (err) =>{
+            if(err) {
+              console.log(err)
+            } else {
+              console.log('save data success!')
+            }
+          })
         }
-      })
+      }
     })
 
     socket.on('disconnect', () => {
