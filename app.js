@@ -4,16 +4,25 @@ const path = require('path')
 const Jimp = require('jimp')
 const fs = require('fs')
 
+
 const app = express()
-const port = 3005
-const server = app.listen(port, '0.0.0.0', () => {
-  console.log('server listening on port', port)
+
+const http = require('http');
+const server = http.createServer(app);
+server
+const { Server } = require("socket.io");
+const io = new Server(server);
+server.listen(3001, () => {
+  console.log('socket on 3001')
 })
 
-const io = socketIO(server)
+
+// http://0.0.0.0:3005
+const url = '0.0.0.0'
+const port = 3005
+
 
 app.use(express.static(path.join(__dirname, '../fe/build')))
-
 
 // var clients = []
 async function main() {
@@ -63,7 +72,6 @@ async function main() {
     })
 
   })
-  
 }
 
 main()
