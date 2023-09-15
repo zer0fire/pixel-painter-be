@@ -7,5 +7,9 @@
   },
   "scripts": {
     "dev": "nodemon app.js"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^0.42.0",
+    "eslint": "^8.49.0"
   }
 }
