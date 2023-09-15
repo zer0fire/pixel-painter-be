@@ -1,86 +1,80 @@
-const express = require('express')
-const socketIO = require('socket.io')
-const path = require('path')
-const Jimp = require('jimp')
-const fs = require('fs')
+const express = require("express");
+const socketIO = require("socket.io");
+const path = require("path");
+const Jimp = require("jimp");
+const fs = require("fs");
 
+const app = express();
 
-const app = express()
-
-const http = require('http');
+const http = require("http");
 const server = http.createServer(app);
-server
+server;
 const { Server } = require("socket.io");
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
 server.listen(3001, () => {
-  console.log('socket on 3001')
-})
-
+  console.log("socket on 3001");
+});
 
 // http://0.0.0.0:3005
-const url = '0.0.0.0'
-const port = 3005
+const url = "0.0.0.0";
+const port = 3005;
 
-
-app.use(express.static(path.join(__dirname, '../fe/build')))
+app.use(express.static(path.join(__dirname, "../fe/build")));
 
 // var clients = []
 async function main() {
-  const pixelData = await Jimp.read("./23333.png") // new Jimp.create(20, 20, 0xffff00ff)
-  let onlineCount = 0
-  let bufDataAry = []
+  const pixelData = await Jimp.read("./23333.png"); // new Jimp.create(20, 20, 0xffff00ff)
+  let onlineCount = 0;
+  let bufDataAry = [];
   // console.log("------------", pixelData)
-  io.on('connection', async (socket) => {
-    onlineCount++
+  io.on("connection", async (socket) => {
+    onlineCount++;
 
-    io.emit('online-count', onlineCount)
+    io.emit("online-count", onlineCount);
     // socket.broadcast.emit('online-count', onlineCount)
     // socket.emit('online-count', onlineCount)
 
-    var pngBuffer = await pixelData.getBufferAsync(Jimp.MIME_PNG)
+    var pngBuffer = await pixelData.getBufferAsync(Jimp.MIME_PNG);
 
-    socket.emit('initial-pixel-data', pngBuffer)
+    socket.emit("initial-pixel-data", pngBuffer);
 
-    socket.on('draw-dot', async ({row, col, color}) => {
-      
-      var hexColor = Jimp.cssColorToHex(color)
-      
-      pixelData.setPixelColor(hexColor, col, row) // [col][row] = color
-      
-      io.emit('update-dot', {row, col, color})
+    socket.on("draw-dot", async ({ row, col, color }) => {
+      var hexColor = Jimp.cssColorToHex(color);
+
+      console.log("🚀 ~ file: app.js:50 ~ socket.on ~ row:", row);
+      console.log("🚀 ~ file: app.js:50 ~ socket.on ~ col:", col);
+      console.log("🚀 ~ file: app.js:50 ~ socket.on ~ hexColor:", hexColor);
+
+      pixelData.setPixelColor(hexColor, col, row); // [col][row] = color
+
+      io.emit("update-dot", { row, col, color });
       // socket.broadcast.emit('update-dot', {row, col, color})
       // socket.emit('update-dot', {row, col, color})
 
-      var buf = await pixelData.getBufferAsync(Jimp.MIME_PNG)
-      bufDataAry.push(buf)
-      if(bufDataAry.length > 4) {
-        for(var item of bufDataAry) {
-          fs.writeFile('./23333.png', item, (err) =>{
-            if(err) {
-              console.log(err)
+      var buf = await pixelData.getBufferAsync(Jimp.MIME_PNG);
+      bufDataAry.push(buf);
+      if (bufDataAry.length > 4) {
+        for (var item of bufDataAry) {
+          fs.writeFile("./23333.png", item, (err) => {
+            if (err) {
+              console.log(err);
             } else {
-              console.log('save data success!')
+              console.log("save data success!");
             }
-          })
+          });
         }
       }
-    })
+    });
 
-    socket.on('disconnect', () => {
-      onlineCount--
-      console.log('some one leave')
-    })
-
-  })
+    socket.on("disconnect", () => {
+      onlineCount--;
+      console.log("some one leave");
+    });
+  });
 }
 
-main()
-
-
-
-
-
-
-
-
-
+main();

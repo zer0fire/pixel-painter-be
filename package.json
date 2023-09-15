@@ -6,6 +6,6 @@
     "socket.io-client": "^4.4.1"
   },
   "scripts": {
-    "start": "nodemon newTest.js"
+    "dev": "nodemon app.js"
   }
 }
