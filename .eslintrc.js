@@ -22,5 +22,7 @@ module.exports = {
   rules: {
     quotes: ["error", "double"],
     semi: "off",
+    allowSingleLine: true,
+    braceStyle: "allman",
   },
 };

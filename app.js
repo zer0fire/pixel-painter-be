@@ -60,7 +60,6 @@ async function main() {
             if (err) {
               // eslint-disable-next-line no-console
               console.log(err);
-              // eslint-disable-next-line brace-style
             } else {
               // eslint-disable-next-line no-console
               console.log("save data success!");
