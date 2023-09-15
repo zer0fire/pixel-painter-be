@@ -1,5 +1,5 @@
 const express = require("express");
-const socketIO = require("socket.io");
+// const socketIO = require("socket.io");
 const path = require("path");
 const Jimp = require("jimp");
 const fs = require("fs");
@@ -8,7 +8,7 @@ const app = express();
 
 const http = require("http");
 const server = http.createServer(app);
-server;
+// server;
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
@@ -44,11 +44,6 @@ async function main() {
 
     socket.on("draw-dot", async ({ row, col, color }) => {
       var hexColor = Jimp.cssColorToHex(color);
-
-      console.log("🚀 ~ file: app.js:50 ~ socket.on ~ row:", row);
-      console.log("🚀 ~ file: app.js:50 ~ socket.on ~ col:", col);
-      console.log("🚀 ~ file: app.js:50 ~ socket.on ~ hexColor:", hexColor);
-
       pixelData.setPixelColor(hexColor, col, row); // [col][row] = color
 
       io.emit("update-dot", { row, col, color });
